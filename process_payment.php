@@ -2,15 +2,15 @@
     require_once 'vendor/autoload.php';
 
 
-echo $_POST['transactionAmount'] . "<BR>"; 
-echo $_POST['token'] . "<BR>"; 
-echo $_POST['description'] . "<BR>"; 
-echo $_POST['installments'] . "<BR>"; 
-echo $_POST['paymentMethodId'] . "<BR>"; 
-echo $_POST['issuer'] . "<BR>"; 
-echo $_POST['email'] . "<BR>"; 
-echo $_POST['docType'] . "<BR>"; 
-echo $_POST['docNumber'] . "<BR>"; 
+echo $_POST['transactionAmount']  ; 
+echo $_POST['token']  ; 
+echo $_POST['description'] ; 
+echo $_POST['installments']  ; 
+echo $_POST['paymentMethodId'] ; 
+echo $_POST['issuer']  ; 
+echo $_POST['email'] ; 
+echo $_POST['docType']  ; 
+echo $_POST['docNumber']  ; 
  
 	MercadoPago\SDK::setAccessToken("TEST-4162999866747892-090313-50dc05b70bfeccafb2de5278f69c6c9d-325440040");
     $payment = new MercadoPago\Payment();
