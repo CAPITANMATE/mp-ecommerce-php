@@ -16,11 +16,7 @@
 
         <link rel="stylesheet" href="/assets/custom.css" type="text/css">
 		
-		
-    </head>
-
-    <body>
-	<script>
+			<script>
 	window.Mercadopago.setPublishableKey("TEST-999d8c20-8c77-4ec2-a106-38154e40c4f5");
 	window.Mercadopago.getIdentificationTypes();
 	document.getElementById('cardNumber').addEventListener('change', guessPaymentMethod);
@@ -126,8 +122,12 @@
 	};
 
 	</script>
+    </head>
+
+    <body>
+
         <div id="content-wrap">
-            <form action="/process_payment" method="post" id="paymentForm">
+            <form action="/process_payment.php" method="post" id="paymentForm">
    <h3>Detalles del comprador</h3>
      <div>
        <div>
