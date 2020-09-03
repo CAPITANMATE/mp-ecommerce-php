@@ -82,7 +82,7 @@
                                 <div class="col-lg-12">
                                     <hr class="p-0 m-0">
                                     <br>
-                                   <form method="post" action="/pagar.php" <button type ="submit">PAGAR</form>
+                                   <form method="post"  <button type ="submit"  onclick="window.location='pagar.php'" >PAGAR</form>
                                 </div>
                             </div>
                         </div>
