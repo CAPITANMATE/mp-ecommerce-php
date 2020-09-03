@@ -1,4 +1,34 @@
- 
+ <?php
+    require_once 'vendor/autoload.php';
+
+    MercadoPago\SDK::setAccessToken("YOUR_ACCESS_TOKEN");
+
+    $payment = new MercadoPago\Payment();
+    $payment->transaction_amount = (float)$_POST['transactionAmount'];
+    $payment->token = $_POST['token'];
+    $payment->description = $_POST['description'];
+    $payment->installments = (int)$_POST['installments'];
+    $payment->payment_method_id = $_POST['paymentMethodId'];
+    $payment->issuer_id = (int)$_POST['issuer'];
+
+    $payer = new MercadoPago\Payer();
+    $payer->email = $_POST['email'];
+    $payer->identification = array( 
+        "type" => $_POST['docType'],
+        "number" => $_POST['docNumber']
+    );
+    $payment->payer = $payer;
+
+    $payment->save();
+
+    $response = array(
+        'status' => $payment->status,
+        'status_detail' => $payment->status_detail,
+        'id' => $payment->id
+    );
+    echo json_encode($response);
+
+?>
   <!DOCTYPE html>
 <html>
     <head>
@@ -15,10 +45,118 @@
 		<script src="https://secure.mlstatic.com/sdk/javascript/v1/mercadopago.js"></script>
 
         <link rel="stylesheet" href="/assets/custom.css" type="text/css">
+		
+		
     </head>
 
     <body>
-        <div id="page-container">
+	<script>
+	window.Mercadopago.setPublishableKey("TEST-999d8c20-8c77-4ec2-a106-38154e40c4f5");
+	window.Mercadopago.getIdentificationTypes();
+	document.getElementById('cardNumber').addEventListener('change', guessPaymentMethod);
+
+	function guessPaymentMethod(event) {
+	   let cardnumber = document.getElementById("cardNumber").value;
+	   if (cardnumber.length >= 6) {
+		   let bin = cardnumber.substring(0,6);
+		   window.Mercadopago.getPaymentMethod({
+			   "bin": bin
+		   }, setPaymentMethod);
+	   }
+	};
+
+	function setPaymentMethod(status, response) {
+	   if (status == 200) {
+		   let paymentMethod = response[0];
+		   document.getElementById('paymentMethodId').value = paymentMethod.id;
+
+		   if(paymentMethod.additional_info_needed.includes("issuer_id")){
+			   getIssuers(paymentMethod.id);
+		   } else {
+			   getInstallments(
+				   paymentMethod.id,
+				   document.getElementById('transactionAmount').value
+			   );
+		   }
+	   } else {
+		   alert(`payment method info error: ${response}`);
+	   }
+	}
+	function getIssuers(paymentMethodId) {
+	   window.Mercadopago.getIssuers(
+		   paymentMethodId,
+		   setIssuers
+	   );
+	}
+
+	function setIssuers(status, response) {
+	   if (status == 200) {
+		   let issuerSelect = document.getElementById('issuer');
+		   response.forEach( issuer => {
+			   let opt = document.createElement('option');
+			   opt.text = issuer.name;
+			   opt.value = issuer.id;
+			   issuerSelect.appendChild(opt);
+		   });
+
+		   getInstallments(
+			   document.getElementById('paymentMethodId').value,
+			   document.getElementById('transactionAmount').value,
+			   issuerSelect.value
+		   );
+	   } else {
+		   alert(`issuers method info error: ${response}`);
+	   }
+	}
+	function getInstallments(paymentMethodId, transactionAmount, issuerId){
+	   window.Mercadopago.getInstallments({
+		   "payment_method_id": paymentMethodId,
+		   "amount": parseFloat(transactionAmount),
+		   "issuer_id": issuerId ? parseInt(issuerId) : undefined
+	   }, setInstallments);
+	}
+
+	function setInstallments(status, response){
+	   if (status == 200) {
+		   document.getElementById('installments').options.length = 0;
+		   response[0].payer_costs.forEach( payerCost => {
+			   let opt = document.createElement('option');
+			   opt.text = payerCost.recommended_message;
+			   opt.value = payerCost.installments;
+			   document.getElementById('installments').appendChild(opt);
+		   });
+	   } else {
+		   alert(`installments method info error: ${response}`);
+	   }
+	}
+	doSubmit = false;
+	document.getElementById('paymentForm').addEventListener('submit', getCardToken);
+	function getCardToken(event){
+	   event.preventDefault();
+	   if(!doSubmit){
+		   let $form = document.getElementById('paymentForm');
+		   window.Mercadopago.createToken($form, setCardTokenAndPay);
+		   return false;
+	   }
+	};
+
+	function setCardTokenAndPay(status, response) {
+	   if (status == 200 || status == 201) {
+		   let form = document.getElementById('paymentForm');
+		   let card = document.createElement('input');
+		   card.setAttribute('name', 'token');
+		   card.setAttribute('type', 'hidden');
+		   card.setAttribute('value', response.id);
+		   form.appendChild(card);
+		   doSubmit=true;
+		   form.submit();
+	   } else {
+		   alert("Verify filled data!\n"+JSON.stringify(response, null, 4));
+	   }
+	};
+
+	</script>
+        <div id="content-wrap">
             <form action="/process_payment" method="post" id="paymentForm">
    <h3>Detalles del comprador</h3>
      <div>

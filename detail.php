@@ -1,3 +1,40 @@
+<?php
+
+    require_once 'vendor/autoload.php';
+
+    MercadoPago\SDK::setAccessToken("TEST-4162999866747892-090313-50dc05b70bfeccafb2de5278f69c6c9d-325440040");
+/*
+    $payment = new MercadoPago\Payment();
+
+    $payment->transaction_amount = 141;
+    $payment->token = "YOUR_CARD_TOKEN";
+    $payment->description = "Ergonomic Silk Shirt";
+    $payment->installments = 1;
+    $payment->payment_method_id = "visa";
+    $payment->payer = array(
+      "email" => "appugliesedamiane@gmail.com"
+    );
+
+    $payment->save();
+
+    echo $payment->status;
+*/
+
+// Crea un objeto de preferencia
+	$preference = new MercadoPago\Preference();
+
+	// Crea un ítem en la preferencia
+	$item = new MercadoPago\Item();
+	$item->title = 'Mi producto';
+	$item->quantity = 1;
+	$item->unit_price = 75.56;
+	$preference->items = array($item);
+	$preference->save();
+  ?>
+  
+  
+
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -45,7 +82,7 @@
                                 <div class="col-lg-12">
                                     <hr class="p-0 m-0">
                                     <br>
-                                    <!-- ADD PAYMENT FORM HERE -->
+                                   <form method="post" action="/pagar.php" <button type ="submit">PAGAR</form>
                                 </div>
                             </div>
                         </div>
