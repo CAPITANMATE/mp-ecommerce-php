@@ -19,7 +19,7 @@
 			<script>
 	window.Mercadopago.setPublishableKey("TEST-999d8c20-8c77-4ec2-a106-38154e40c4f5");
 	window.Mercadopago.getIdentificationTypes();
-	document.getElementById('cardNumber').addEventListener('change', guessPaymentMethod);
+
 </script>
     </head>
 
@@ -95,7 +95,7 @@
    </div>
  </form>
  <script>
- 
+ 	document.getElementById('cardNumber').addEventListener('change', guessPaymentMethod);
 	function guessPaymentMethod(event) {
 	   let cardnumber = document.getElementById("cardNumber").value;
 	   if (cardnumber.length >= 6) {
